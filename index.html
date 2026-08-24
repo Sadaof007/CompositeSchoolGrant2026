@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Grants Viewer 2026</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a237e, #0d47a1);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header .badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        /* Filter Section */
+        .filters {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px 25px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            min-width: 160px;
+            transition: border-color 0.3s;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+
+        .filter-group select {
+            min-width: 180px;
+            cursor: pointer;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0 12px;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus-within {
+            border-color: #1a237e;
+        }
+
+        .search-box i {
+            color: #999;
+        }
+
+        .search-box input {
+            border: none;
+            padding: 8px 10px;
+            font-size: 14px;
+            min-width: 180px;
+            outline: none;
+        }
+
+        .btn-reset {
+            padding: 8px 18px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .btn-reset:hover {
+            background: #c0392b;
+        }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .stats .stat-item {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+            font-size: 14px;
+        }
+
+        .stats .stat-item span {
+            font-weight: 700;
+            color: #1a237e;
+        }
+
+        /* Table Wrapper */
+        .table-wrapper {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #1a237e, #0d47a1);
+            color: white;
+        }
+
+        thead th {
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 500;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        thead th:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        thead th i {
+            margin-left: 6px;
+            font-size: 11px;
+        }
+
+        tbody td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background: #f8f9ff;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        tbody tr:nth-child(even):hover {
+            background: #f0f2ff;
+        }
+
+        /* Row highlight for grants */
+        .grant-amount {
+            font-weight: 600;
+            color: #1a237e;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 18px;
+            }
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-group {
+                flex-wrap: wrap;
+            }
+            .filter-group select,
+            .filter-group input,
+            .search-box input {
+                min-width: 120px;
+                width: 100%;
+            }
+            .search-box {
+                width: 100%;
+            }
+            .search-box input {
+                min-width: auto;
+            }
+            table {
+                font-size: 12px;
+            }
+            thead th,
+            tbody td {
+                padding: 8px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            .header {
+                padding: 15px 18px;
+            }
+            .header h1 {
+                font-size: 15px;
+            }
+            .stats .stat-item {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            table {
+                font-size: 11px;
+            }
+            thead th,
+            tbody td {
+                padding: 6px 8px;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-school" style="margin-right: 12px;"></i>School Grants 2026</h1>
+            <span class="badge"><i class="fas fa-database"></i> <span id="recordCount">0</span> records</span>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters" id="filters">
+            <div class="filter-group">
+                <label><i class="fas fa-map-marker-alt"></i> District</label>
+                <select id="filterDistrict">
+                    <option value="">All Districts</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fas fa-city"></i> Block</label>
+                <select id="filterBlock">
+                    <option value="">All Blocks</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fas fa-tag"></i> School Type</label>
+                <select id="filterSchoolType">
+                    <option value="">All Types</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fas fa-users"></i> Enr. Slab</label>
+                <select id="filterEnrSlab">
+                    <option value="">All Slabs</option>
+                </select>
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search school, code...">
+            </div>
+
+            <button class="btn-reset" id="resetBtn"><i class="fas fa-undo"></i> Reset</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-item">Total Schools: <span id="totalSchools">0</span></div>
+            <div class="stat-item">Total Grant Amount: <span id="totalGrant">₹0</span></div>
+            <div class="stat-item">Filtered: <span id="filteredCount">0</span></div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrapper">
+            <table>
+                <thead id="tableHead">
+                    <tr id="headerRow"></tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <i class="fas fa-code"></i> Data from Camposite School Grants 2026 &bull; <span id="displayCount">0</span> rows displayed
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
