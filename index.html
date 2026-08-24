@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>School Grants Viewer 2026</title>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, #1a237e, #0d47a1);
+            color: #fff;
+            padding: 18px 24px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+        .header h1 i {
+            margin-right: 10px;
+        }
+        .header .badge {
+            background: rgba(255, 255, 255, 0.18);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+        }
+        .header .badge i {
+            margin-right: 6px;
+        }
+
+        /* ===== FILTERS ===== */
+        .filters {
+            background: #fff;
+            padding: 20px 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px 22px;
+            align-items: flex-end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 170px;
+        }
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+        }
+        .filter-group label i {
+            margin-right: 6px;
+            color: #1a237e;
+        }
+        .filter-group select {
+            padding: 9px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fff;
+            width: 100%;
+            cursor: pointer;
+            transition: border 0.25s;
+        }
+        .filter-group select:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+        .filter-group select:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            padding: 9px 24px;
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.25s;
+            flex-shrink: 0;
+        }
+        .btn-reset:hover {
+            background: #c0392b;
+        }
+
+        /* ===== SELECTED SCHOOL INFO ===== */
+        .selected-school-info {
+            background: #e8eaf6;
+            padding: 14px 20px;
+            border-radius: 10px;
+            border-left: 5px solid #1a237e;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .selected-school-info .school-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a237e;
+        }
+        .selected-school-info .school-detail {
+            font-size: 14px;
+            color: #555;
+            margin-top: 4px;
+        }
+        .selected-school-info .school-detail i {
+            margin: 0 6px;
+            color: #888;
+        }
+
+        /* ===== STATS ===== */
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .stats .stat-item {
+            background: #fff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+        .stats .stat-item span {
+            font-weight: 700;
+            color: #1a237e;
+        }
+
+        /* ===== TABLE ===== */
+        .table-wrapper {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        thead {
+            background: linear-gradient(135deg, #1a237e, #0d47a1);
+            color: #fff;
+        }
+        thead th {
+            padding: 11px 14px;
+            text-align: left;
+            white-space: nowrap;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        tbody td {
+            padding: 9px 14px;
+            border-bottom: 1px solid #f0f0f0;
+            white-space: nowrap;
+        }
+        tbody tr:hover {
+            background: #f5f6ff;
+        }
+        tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+        tbody tr:nth-child(even):hover {
+            background: #f0f2ff;
+        }
+        .grant-amount {
+            font-weight: 600;
+            color: #1a237e;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 16px 0 6px;
+            color: #999;
+            font-size: 13px;
+        }
+        .footer i {
+            margin-right: 4px;
+        }
+
+        /* ===== LOADING / ERROR ===== */
+        .loading-msg,
+        .error-msg {
+            text-align: center;
+            padding: 50px 20px;
+            font-size: 16px;
+            color: #666;
+        }
+        .error-msg {
+            color: #e74c3c;
+        }
+        .error-msg i {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 14px;
+        }
+        .error-msg small {
+            display: block;
+            margin-top: 10px;
+            color: #999;
+            font-size: 13px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            .header h1 {
+                font-size: 18px;
+            }
+            .filters {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 16px;
+            }
+            .filter-group {
+                min-width: auto;
+            }
+            .btn-reset {
+                justify-content: center;
+                height: 42px;
+                width: 100%;
+            }
+            .stats .stat-item {
+                font-size: 13px;
+            }
+            table {
+                font-size: 12px;
+            }
+            thead th,
+            tbody td {
+                padding: 6px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header h1 {
+                font-size: 16px;
+            }
+            table {
+                font-size: 11px;
+            }
+            thead th,
+            tbody td {
+                padding: 5px 7px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <h1><i class="fas fa-school"></i>School Grants Viewer 2026</h1>
+            <span class="badge"><i class="fas fa-database"></i> <span id="recordCount">0</span> records</span>
+        </div>
+
+        <!-- ===== FILTERS ===== -->
+        <div class="filters">
+            <div class="filter-group">
+                <label><i class="fas fa-map-marker-alt"></i> District Name</label>
+                <select id="filterDistrict">
+                    <option value="">-- Select District --</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fas fa-city"></i> Mandal / Block Name</label>
+                <select id="filterBlock" disabled>
+                    <option value="">-- Select District First --</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fas fa-school"></i> School Name</label>
+                <select id="filterSchool" disabled>
+                    <option value="">-- Select Mandal First --</option>
+                </select>
+            </div>
+
+            <button class="btn-reset" id="resetBtn">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+        </div>
+
+        <!-- ===== SELECTED SCHOOL INFO ===== -->
+        <div class="selected-school-info" id="selectedSchoolInfo">
+            <div class="school-name" id="selectedSchoolName">🏫 School Name</div>
+            <div class="school-detail" id="selectedSchoolDetail">
+                <i class="fas fa-map-marker-alt"></i> District
+                <i class="fas fa-chevron-right"></i>
+                <i class="fas fa-city"></i> Mandal
+                <i class="fas fa-chevron-right"></i>
+                <i class="fas fa-code"></i> School Code
+            </div>
+        </div>
+
+        <!-- ===== STATS ===== -->
+        <div class="stats">
+            <div class="stat-item">📚 Total Schools: <span id="totalSchools">0</span></div>
+            <div class="stat-item">📌 Filtered: <span id="filteredCount">0</span></div>
+            <div class="stat-item">💰 Total Grant: <span id="totalGrant">₹0</span></div>
+        </div>
+
+        <!-- ===== TABLE ===== -->
+        <div class="table-wrapper">
+            <table>
+                <thead id="tableHead">
+                    <tr id="headerRow"></tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="12" class="loading-msg">
+                            <i class="fas fa-spinner fa-spin" style="font-size:28px;"></i><br><br>
+                            Loading data...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <i class="fas fa-table"></i> <span id="displayCount">0</span> rows displayed
+        </div>
+
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- ======================== SCRIPT ========================== -->
+    <!-- ========================================================== -->
+    <script>
+        (function() {
+            'use strict';
+
+            // =================================================================
+            // 1. DATA
+            // =================================================================
+            let allData = [];
+            let filteredData = [];
+            let headers = [];
+
+            // Column name mappings (auto-detected)
+            let colMap = {
+                district: 'Dist. Name',
+                block: 'Block name',
+                school: 'School Name',
+                schoolCode: 'School code',
+                amount: 'Amount'
+            };
+
+            // Caches for cascading dropdowns
+            let districtMap = {}; // district -> array of blocks
+            let blockMap = {}; // district||block -> array of {name, code}
+
+            // DOM references (cached)
+            const $ = id => document.getElementById(id);
+            const districtSel = $('filterDistrict');
+            const blockSel = $('filterBlock');
+            const schoolSel = $('filterSchool');
+            const resetBtn = $('resetBtn');
+            const headerRow = $('headerRow');
+            const tableBody = $('tableBody');
+            const recordCount = $('recordCount');
+            const totalSchools = $('totalSchools');
+            const filteredCount = $('filteredCount');
+            const totalGrant = $('totalGrant');
+            const displayCount = $('displayCount');
+            const schoolInfoDiv = $('selectedSchoolInfo');
+            const schoolNameEl = $('selectedSchoolName');
+            const schoolDetailEl = $('selectedSchoolDetail');
+
+            // =================================================================
+            // 2. CSV PARSER
+            // =================================================================
+            function parseCSV(csvText) {
+                const lines = [];
+                let cur = [];
+                let field = '';
+                let inQuotes = false;
+
+                for (let i = 0; i < csvText.length; i++) {
+                    const ch = csvText[i];
+                    if (inQuotes) {
+                        if (ch === '"' && csvText[i + 1] === '"') {
+                            field += '"';
+                            i++;
+                        } else if (ch === '"') {
+                            inQuotes = false;
+                        } else {
+                            field += ch;
+                        }
+                    } else {
+                        if (ch === '"') {
+                            inQuotes = true;
+                        } else if (ch === ',') {
+                            cur.push(field.trim());
+                            field = '';
+                        } else if (ch === '\n') {
+                            cur.push(field.trim());
+                            field = '';
+                            if (cur.some(f => f.length > 0)) lines.push(cur);
+                            cur = [];
+                        } else {
+                            field += ch;
+                        }
+                    }
+                }
+                if (field || cur.length) {
+                    cur.push(field.trim());
+                    if (cur.some(f => f.length > 0)) lines.push(cur);
+                }
+                return lines;
+            }
+
+            // =================================================================
+            // 3. COLUMN AUTO-DETECTION
+            // =================================================================
+            function detectColumns(headerRowArr) {
+                const lower = headerRowArr.map(h => h.toLowerCase().trim());
+
+                const find = (keywords) => {
+                    const idx = lower.findIndex(h => keywords.some(k => h.includes(k)));
+                    return idx !== -1 ? headerRowArr[idx] : null;
+                };
+
+                const d = find(['dist', 'district']);
+                if (d) colMap.district = d;
+
+                const b = find(['block', 'mandal']);
+                if (b) colMap.block = b;
+
+                const s = find(['school name', 'schoolname']);
+                if (s) colMap.school = s;
+
+                const c = find(['school code', 'schoolcode', 'code', 'sch code']);
+                if (c) colMap.schoolCode = c;
+
+                const a = find(['amount', 'grant', 'lakh']);
+                if (a) colMap.amount = a;
+
+                console.log('✅ Detected columns:', colMap);
+            }
+
+            // =================================================================
+            // 4. LOAD DATA
+            // =================================================================
+            async function loadData() {
+                try {
+                    const resp = await fetch('data.csv');
+                    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+
+                    const csv = await resp.text();
+                    const rows = parseCSV(csv);
+
+                    if (rows.length < 2) throw new Error('No data rows found.');
+
+                    headers = rows[0];
+                    detectColumns(headers);
+
+                    // Build objects
+                    allData = rows.slice(1).map(row => {
+                        const obj = {};
+                        headers.forEach((h, i) => { obj[h] = row[i] || ''; });
+                        return obj;
+                    });
+
+                    // Remove rows with empty/invalid district
+                    allData = allData.filter(row => {
+                        const d = row[colMap.district] || '';
+                        return d.trim() && d !== 'Unknown' && d !== 'NA' && d !== 'N/A';
+                    });
+
+                    // Build maps
+                    buildMaps();
+
+                    // Initial display
+                    filteredData = [...allData];
+                    populateDistricts();
+                    renderTable();
+                    updateStats();
+
+                    // Enable events after data load
+                    initEvents();
+
+                } catch (err) {
+                    console.error('Load error:', err);
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="12" class="error-msg">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Could not load data.csv</strong><br>
+                                Make sure the file exists in the same folder as index.html
+                                <small>Error: ${err.message}</small>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+
+            // =================================================================
+            // 5. BUILD MAPS (District → Block → School)
+            // =================================================================
+            function buildMaps() {
+                const dCol = colMap.district;
+                const bCol = colMap.block;
+                const sCol = colMap.school;
+                const cCol = colMap.schoolCode;
+
+                districtMap = {};
+                blockMap = {};
+
+                allData.forEach(row => {
+                    const dist = row[dCol] || 'Unknown';
+                    const block = row[bCol] || 'Unknown';
+                    const school = row[sCol] || 'Unknown';
+                    const code = row[cCol] || '';
+
+                    // District → Blocks
+                    if (!districtMap[dist]) districtMap[dist] = new Set();
+                    districtMap[dist].add(block);
+
+                    // District+Block → Schools
+                    const key = dist + '||' + block;
+                    if (!blockMap[key]) blockMap[key] = [];
+                    if (!blockMap[key].find(s => s.name === school)) {
+                        blockMap[key].push({ name: school, code: code });
+                    }
+                });
+
+                // Convert Sets to sorted arrays
+                for (const d in districtMap) {
+                    districtMap[d] = Array.from(districtMap[d])
+                        .filter(b => b !== 'Unknown')
+                        .sort();
+                }
+                for (const key in blockMap) {
+                    blockMap[key].sort((a, b) => a.name.localeCompare(b.name));
+                }
+
+                // Remove districts with no blocks
+                for (const d in districtMap) {
+                    if (districtMap[d].length === 0) delete districtMap[d];
+                }
+            }
+
+            // =================================================================
+            // 6. POPULATE DROPDOWNS
+            // =================================================================
+            function populateDistricts() {
+                const districts = Object.keys(districtMap)
+                    .filter(d => d !== 'Unknown')
+                    .sort();
+
+                districtSel.innerHTML = '<option value="">-- Select District --</option>';
+                districts.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.textContent = d;
+                    districtSel.appendChild(opt);
+                });
+
+                // If only one district, auto-select it
+                if (districts.length === 1) {
+                    districtSel.value = districts[0];
+                    districtSel.dispatchEvent(new Event('change'));
+                }
+            }
+
+            function populateBlocks(district) {
+                blockSel.innerHTML = '<option value="">-- Select Mandal --</option>';
+                if (!district || !districtMap[district]) {
+                    blockSel.disabled = true;
+                    return;
+                }
+                blockSel.disabled = false;
+                const blocks = districtMap[district] || [];
+                blocks.forEach(b => {
+                    const opt = document.createElement('option');
+                    opt.value = b;
+                    opt.textContent = b;
+                    blockSel.appendChild(opt);
+                });
+            }
+
+            function populateSchools(district, block) {
+                schoolSel.innerHTML = '<option value="">-- Select School --</option>';
+                if (!district || !block) {
+                    schoolSel.disabled = true;
+                    return;
+                }
+                const key = district + '||' + block;
+                const schools = blockMap[key] || [];
+                if (!schools.length) {
+                    schoolSel.disabled = true;
+                    return;
+                }
+                schoolSel.disabled = false;
+                schools.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.name;
+                    opt.textContent = s.code ? `${s.name} (${s.code})` : s.name;
+                    schoolSel.appendChild(opt);
+                });
+            }
+
+            // =================================================================
+            // 7. APPLY FILTERS
+            // =================================================================
+            function applyFilters() {
+                const dist = districtSel.value;
+                const block = blockSel.value;
+                const school = schoolSel.value;
+
+                // Filter data
+                filteredData = allData.filter(row => {
+                    if (dist && row[colMap.district] !== dist) return false;
+                    if (block && row[colMap.block] !== block) return false;
+                    if (school && row[colMap.school] !== school) return false;
+                    return true;
+                });
+
+                // Show selected school info
+                if (school && dist && block) {
+                    const row = allData.find(r =>
+                        r[colMap.district] === dist &&
+                        r[colMap.block] === block &&
+                        r[colMap.school] === school
+                    );
+                    showSchoolInfo(row);
+                } else {
+                    hideSchoolInfo();
+                }
+
+                renderTable();
+                updateStats();
+            }
+
+            // =================================================================
+            // 8. SCHOOL INFO DISPLAY
+            // =================================================================
+            function showSchoolInfo(row) {
+                if (!row) return;
+                schoolInfoDiv.style.display = 'block';
+                schoolNameEl.textContent = '🏫 ' + (row[colMap.school] || 'N/A');
+
+                const parts = [
+                    row[colMap.district] || '',
+                    row[colMap.block] || '',
+                    row[colMap.schoolCode] || ''
+                ].filter(p => p);
+
+                schoolDetailEl.innerHTML = parts.map((p, i) => {
+                    const icons = ['fa-map-marker-alt', 'fa-city', 'fa-code'];
+                    return `<i class="fas ${icons[i] || 'fa-tag'}"></i> ${p}`;
+                }).join(' <i class="fas fa-chevron-right" style="font-size:11px;color:#999;"></i> ');
+            }
+
+            function hideSchoolInfo() {
+                schoolInfoDiv.style.display = 'none';
+            }
+
+            // =================================================================
+            // 9. RENDER TABLE
+            // =================================================================
+            function renderTable() {
+                // Which columns to show
+                const preferred = [
+                    'Sl.No.', 'Dist. Name', 'Block name', 'School Name',
+                    'Schcat', 'Schcat1', 'Schmgt_abstract', 'Catg',
+                    'Enr_slab', 'Enrol', 'Grant_a_mount in_lakhs', 'Amount'
+                ];
+                let cols = preferred.filter(c => headers.includes(c));
+                if (!cols.length) cols = headers.slice(0, 8);
+
+                // Header
+                headerRow.innerHTML = cols.map(h => `<th>${h}</th>`).join('');
+
+                // Body
+                if (!filteredData.length) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="${cols.length}" style="text-align:center;padding:40px;color:#999;">
+                                <i class="fas fa-search" style="font-size:22px;"></i><br><br>
+                                No schools found. Try changing filters.
+                            </td>
+                        </tr>
+                    `;
+                    displayCount.textContent = '0';
+                    return;
+                }
+
+                tableBody.innerHTML = filteredData.map(row =>
+                    `<tr>${cols.map(col => {
+                        let val = row[col] || '';
+                        if (col === 'Amount' || col === 'Grant_a_mount in_lakhs') {
+                            return `<td class="grant-amount">${val}</td>`;
+                        }
+                        return `<td>${val}</td>`;
+                    }).join('')}</tr>`
+                ).join('');
+
+                displayCount.textContent = filteredData.length;
+            }
+
+            // =================================================================
+            // 10. UPDATE STATS
+            // =================================================================
+            function updateStats() {
+                const total = allData.length;
+                const filtered = filteredData.length;
+
+                recordCount.textContent = total;
+                totalSchools.textContent = total;
+                filteredCount.textContent = filtered;
+
+                // Total grant
+                const amtCol = colMap.amount;
+                if (amtCol) {
+                    const sum = filteredData.reduce((s, row) => {
+                        const v = parseFloat(String(row[amtCol]).replace(/,/g, ''));
+                        return s + (isNaN(v) ? 0 : v);
+                    }, 0);
+                    totalGrant.textContent = '₹' + sum.toLocaleString('en-IN');
+                } else {
+                    totalGrant.textContent = '₹0';
+                }
+            }
+
+            // =================================================================
+            // 11. EVENT LISTENERS
+            // =================================================================
+            function initEvents() {
+                // District → Blocks
+                districtSel.addEventListener('change', function() {
+                    const dist = this.value;
+                    populateBlocks(dist);
+                    // Reset school
+                    schoolSel.innerHTML = '<option value="">-- Select Mandal First --</option>';
+                    schoolSel.disabled = true;
+                    applyFilters();
+                });
+
+                // Block → Schools
+                blockSel.addEventListener('change', function() {
+                    const dist = districtSel.value;
+                    const block = this.value;
+                    populateSchools(dist, block);
+                    applyFilters();
+                });
+
+                // School → Apply
+                schoolSel.addEventListener('change', applyFilters);
+
+                // Reset
+                resetBtn.addEventListener('click', function() {
+                    districtSel.value = '';
+                    blockSel.innerHTML = '<option value="">-- Select District First --</option>';
+                    blockSel.disabled = true;
+                    schoolSel.innerHTML = '<option value="">-- Select Mandal First --</option>';
+                    schoolSel.disabled = true;
+                    hideSchoolInfo();
+                    filteredData = [...allData];
+                    renderTable();
+                    updateStats();
+                });
+            }
+
+            // =================================================================
+            // 12. START
+            // =================================================================
+            document.addEventListener('DOMContentLoaded', function() {
+                loadData();
+            });
+
+        })();
+    </script>
+
+</body>
+</html>
