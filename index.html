@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>తెలంగాణ పాఠశాలల ఫండ్ వివరాలు | Telangana School Funds</title>
+  <style>
+    :root {
+      --primary: #0d6efd;
+      --primary-dark: #0a58ca;
+      --bg: #f0f4f8;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --muted: #6c757d;
+      --border: #dee2e6;
+      --success: #198754;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .header {
+      background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+      color: white;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .header p {
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+    .container {
+      max-width: 720px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+    select {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      font-size: 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.9rem center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(13,110,253,0.2);
+    }
+    select:disabled {
+      background-color: #e9ecef;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .field {
+      margin-bottom: 1.1rem;
+    }
+    .field:last-child { margin-bottom: 0; }
+    #result {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .school-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #e9ecef;
+    }
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+    @media (max-width: 500px) {
+      .details-grid { grid-template-columns: 1fr; }
+    }
+    .detail-item {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      border-left: 4px solid var(--primary);
+    }
+    .detail-item.amount { border-left-color: var(--success); }
+    .detail-item.general { border-left-color: #0dcaf0; }
+    .detail-item.sc { border-left-color: #ffc107; }
+    .detail-item.st { border-left-color: #fd7e14; }
+    .detail-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+    }
+    .detail-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+    }
+    .error {
+      background: #f8d7da;
+      color: #842029;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+    .stats {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>తెలంగాణ పాఠశాలల నిధి వివరాలు</h1>
+    <p>District → Mandal → School ఎంచుకుని వివరాలు చూడండి</p>
+  </div>
+
+  <div class="container">
+    <div id="loading" class="card loading">
+      డేటా లోడ్ అవుతోంది... దయచేసి వేచి ఉండండి
+    </div>
+
+    <div id="app" style="display:none;">
+      <div class="card">
+        <h2>🔍 పాఠశాలను ఎంచుకోండి</h2>
+
+        <div class="field">
+          <label for="district">1. జిల్లా (District)</label>
+          <select id="district">
+            <option value="">-- జిల్లా ఎంచుకోండి --</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="mandal">2. మండలం (Mandal)</label>
+          <select id="mandal" disabled>
+            <option value="">-- ముందు జిల్లా ఎంచుకోండి --</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="school">3. పాఠశాల (School)</label>
+          <select id="school" disabled>
+            <option value="">-- ముందు మండలం ఎంచుకోండి --</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="result" class="card">
+        <div class="school-name" id="schoolName"></div>
+        <div class="details-grid">
+          <div class="detail-item">
+            <div class="detail-label">స్కూల్ కోడ్ (School Code)</div>
+            <div class="detail-value" id="schoolCode">—</div>
+          </div>
+          <div class="detail-item amount">
+            <div class="detail-label">మొత్తం అమౌంట్ (Total Amount)</div>
+            <div class="detail-value" id="amount">—</div>
+          </div>
+          <div class="detail-item general">
+            <div class="detail-label">General Component</div>
+            <div class="detail-value" id="general">—</div>
+          </div>
+          <div class="detail-item sc">
+            <div class="detail-label">SC Component</div>
+            <div class="detail-value" id="sc">—</div>
+          </div>
+          <div class="detail-item st">
+            <div class="detail-label">ST Component</div>
+            <div class="detail-value" id="st">—</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="stats" id="stats"></p>
+    </div>
+  </div>
+
+  <footer>
+    తెలంగాణ పాఠశాలల డేటా • GitHub Pages తో హోస్ట్ చేయబడింది
+  </footer>
+
+  <script>
+    let schoolsData = null;
+
+    const districtSelect = document.getElementById('district');
+    const mandalSelect = document.getElementById('mandal');
+    const schoolSelect = document.getElementById('school');
+    const resultDiv = document.getElementById('result');
+
+    function formatNumber(n) {
+      if (!n) return '—';
+      return Number(n).toLocaleString('en-IN');
+    }
+
+    function resetMandal() {
+      mandalSelect.innerHTML = '<option value="">-- ముందు జిల్లా ఎంచుకోండి --</option>';
+      mandalSelect.disabled = true;
+      resetSchool();
+    }
+
+    function resetSchool() {
+      schoolSelect.innerHTML = '<option value="">-- ముందు మండలం ఎంచుకోండి --</option>';
+      schoolSelect.disabled = true;
+      resultDiv.style.display = 'none';
+    }
+
+    function populateDistricts() {
+      const districts = Object.keys(schoolsData).sort();
+      districts.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        districtSelect.appendChild(opt);
+      });
+      document.getElementById('stats').textContent =
+        `మొత్తం ${districts.length} జిల్లాలు • డేటా సిద్ధం`;
+    }
+
+    districtSelect.addEventListener('change', () => {
+      const district = districtSelect.value;
+      resetMandal();
+      if (!district) return;
+
+      const mandals = Object.keys(schoolsData[district]).sort();
+      mandalSelect.innerHTML = '<option value="">-- మండలం ఎంచుకోండి --</option>';
+      mandals.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        mandalSelect.appendChild(opt);
+      });
+      mandalSelect.disabled = false;
+    });
+
+    mandalSelect.addEventListener('change', () => {
+      const district = districtSelect.value;
+      const mandal = mandalSelect.value;
+      resetSchool();
+      if (!mandal) return;
+
+      const schools = schoolsData[district][mandal];
+      schoolSelect.innerHTML = '<option value="">-- పాఠశాల ఎంచుకోండి --</option>';
+      schools.forEach((s, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = s.name;
+        schoolSelect.appendChild(opt);
+      });
+      schoolSelect.disabled = false;
+    });
+
+    schoolSelect.addEventListener('change', () => {
+      const district = districtSelect.value;
+      const mandal = mandalSelect.value;
+      const idx = schoolSelect.value;
+      if (idx === '') {
+        resultDiv.style.display = 'none';
+        return;
+      }
+
+      const school = schoolsData[district][mandal][idx];
+      document.getElementById('schoolName').textContent = school.name;
+      document.getElementById('schoolCode').textContent = school.code || '—';
+      document.getElementById('amount').textContent = '₹ ' + formatNumber(school.amount);
+      document.getElementById('general').textContent = '₹ ' + formatNumber(school.general);
+      document.getElementById('sc').textContent = '₹ ' + formatNumber(school.sc);
+      document.getElementById('st').textContent = '₹ ' + formatNumber(school.st);
+      resultDiv.style.display = 'block';
+    });
+
+    // Load data
+    fetch('schools_data.json')
+      .then(res => {
+        if (!res.ok) throw new Error('డేటా ఫైల్ లభించలేదు');
+        return res.json();
+      })
+      .then(data => {
+        schoolsData = data;
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        populateDistricts();
+      })
+      .catch(err => {
+        document.getElementById('loading').innerHTML =
+          `<div class="error">దోషం: ${err.message}<br>schools_data.json ఫైల్ ఇదే ఫోల్డర్‌లో ఉందో చూసుకోండి.</div>`;
+      });
+  </script>
+</body>
+</html>
